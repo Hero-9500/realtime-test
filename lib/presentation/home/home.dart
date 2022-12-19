@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:realtime_test/core/colors.dart';
+import 'package:realtime_test/presentation/widgets/date_indicator.dart';
+import 'package:realtime_test/presentation/widgets/date_picker.dart';
 import 'package:realtime_test/presentation/widgets/primary_button.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -13,6 +15,41 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  DateTime? withoutPresetDateTime;
+  DateTime? fourPresetDateTime;
+  DateTime? sixPresetDateTime;
+
+  void showDatePicker(DatePreset datePreset) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => CustomDatePicker(
+        datePreset: datePreset,
+        save: (dateTime) {
+          switch (datePreset) {
+            case DatePreset.none:
+              setState(() {
+                withoutPresetDateTime = dateTime;
+              });
+              break;
+            case DatePreset.four:
+              setState(() {
+                fourPresetDateTime = dateTime;
+              });
+              break;
+            case DatePreset.six:
+              setState(() {
+                sixPresetDateTime = dateTime;
+              });
+              break;
+            default:
+              break;
+          }
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,18 +68,53 @@ class _MyHomePageState extends State<MyHomePage> {
             const SizedBox(height: 42),
             PrimaryButton(
               buttonText: 'Without preset',
-              onPressed: () {},
+              onPressed: () {
+                showDatePicker(DatePreset.none);
+              },
             ),
-            const SizedBox(height: 80),
+            if (withoutPresetDateTime != null) ...[
+              const SizedBox(height: 16),
+              DateIndicator(
+                dateTime: withoutPresetDateTime!,
+                cancel: () => setState(() {
+                  withoutPresetDateTime = null;
+                }),
+              ),
+              const SizedBox(height: 40),
+            ] else
+              const SizedBox(height: 80),
             PrimaryButton(
               buttonText: 'With 4 presets',
-              onPressed: () {},
+              onPressed: () {
+                showDatePicker(DatePreset.four);
+              },
             ),
-            const SizedBox(height: 80),
+            if (fourPresetDateTime != null) ...[
+              const SizedBox(height: 16),
+              DateIndicator(
+                dateTime: fourPresetDateTime!,
+                cancel: () => setState(() {
+                  fourPresetDateTime = null;
+                }),
+              ),
+              const SizedBox(height: 40),
+            ] else
+              const SizedBox(height: 80),
             PrimaryButton(
               buttonText: 'With 6 presets',
-              onPressed: () {},
+              onPressed: () {
+                showDatePicker(DatePreset.six);
+              },
             ),
+            if (sixPresetDateTime != null) ...[
+              const SizedBox(height: 16),
+              DateIndicator(
+                dateTime: sixPresetDateTime!,
+                cancel: () => setState(() {
+                  sixPresetDateTime = null;
+                }),
+              ),
+            ],
           ],
         ),
       ),
