@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
+
 import 'package:realtime_test/core/colors.dart';
 import 'package:realtime_test/core/date_format.dart';
 import 'package:realtime_test/presentation/widgets/primary_button.dart';
-import 'package:table_calendar/table_calendar.dart';
 
 class CustomDatePicker extends StatefulWidget {
   final DateTime? dateTime;
@@ -23,6 +25,24 @@ class CustomDatePicker extends StatefulWidget {
 
 class _CustomDatePickerState extends State<CustomDatePicker> {
   var dateToday = DateTime.now();
+
+  var selectedPreset = '';
+
+  final fourPreset = [
+    'Never ends',
+    '15 days later',
+    '30 days later',
+    '60 days later',
+  ];
+
+  final sixPreset = [
+    'Yesterday',
+    'Today',
+    'Tomorrow',
+    'This Saturday',
+    'This Sunday',
+    'Next Tuesday',
+  ];
 
   @override
   void initState() {
@@ -65,6 +85,88 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
         );
       });
 
+  DateTime getDate(String day) {
+    var date = DateTime.now();
+
+    while (true) {
+      if (DateFormat('EEEE').format(date).toLowerCase() == day.toLowerCase()) {
+        return date;
+      }
+      date = DateTime(
+        date.year,
+        date.month,
+        date.day + 1,
+      );
+    }
+  }
+
+  void changeDate() {
+    final today = DateTime.now();
+    switch (selectedPreset) {
+      case 'Yesterday':
+        setState(() {
+          dateToday = DateTime(
+            today.year,
+            today.month,
+            today.day - 1,
+          );
+        });
+        break;
+      case 'This Saturday':
+      case 'This Sunday':
+      case 'Next Tuesday':
+        setState(() {
+          dateToday = getDate(
+            selectedPreset.split(' ').last,
+          );
+        });
+        break;
+      case 'Today':
+      case 'Never ends':
+        setState(() {
+          dateToday = today;
+        });
+        break;
+      case 'Tomorrow':
+        setState(() {
+          dateToday = DateTime(
+            today.year,
+            today.month,
+            today.day + 1,
+          );
+        });
+        break;
+      case '15 days later':
+        setState(() {
+          dateToday = DateTime(
+            today.year,
+            today.month,
+            today.day + 15,
+          );
+        });
+        break;
+      case '30 days later':
+        setState(() {
+          dateToday = DateTime(
+            today.year,
+            today.month,
+            today.day + 30,
+          );
+        });
+        break;
+      case '60 days later':
+        setState(() {
+          dateToday = DateTime(
+            today.year,
+            today.month,
+            today.day + 60,
+          );
+        });
+        break;
+      default:
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -81,7 +183,68 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 25),
+            const SizedBox(height: 24),
+            if (widget.datePreset != DatePreset.none) ...[
+              ...List.generate(
+                widget.datePreset == DatePreset.four
+                    ? fourPreset.length ~/ 2
+                    : sixPreset.length ~/ 2,
+                (index) {
+                  final list = widget.datePreset == DatePreset.four
+                      ? fourPreset
+                      : sixPreset;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: Row(
+                      children: [
+                        PrimaryButton(
+                          buttonText: list[index * 2],
+                          width: 173,
+                          height: 35,
+                          onPressed: () {
+                            setState(() {
+                              selectedPreset = list[index * 2];
+                            });
+                            changeDate();
+                          },
+                          buttonColor: list[index * 2] == selectedPreset
+                              ? AppColors.buttonBlue
+                              : AppColors.aliceBlue,
+                          textColor: list[index * 2] == selectedPreset
+                              ? AppColors.white
+                              : AppColors.buttonBlue,
+                        ),
+                        const Spacer(),
+                        PrimaryButton(
+                          buttonText: list[index * 2 + 1],
+                          width: 173,
+                          height: 35,
+                          onPressed: () {
+                            setState(() {
+                              selectedPreset = list[index * 2 + 1];
+                            });
+                            changeDate();
+                          },
+                          buttonColor: list[index * 2 + 1] == selectedPreset
+                              ? AppColors.buttonBlue
+                              : AppColors.aliceBlue,
+                          textColor: list[index * 2 + 1] == selectedPreset
+                              ? AppColors.white
+                              : AppColors.buttonBlue,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 25),
+            ],
+            if (widget.datePreset == DatePreset.four) ...[
+              const SizedBox(height: 25),
+            ],
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
