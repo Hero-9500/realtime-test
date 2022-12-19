@@ -25,6 +25,13 @@ class _MyHomePageState extends State<MyHomePage> {
       barrierDismissible: false,
       builder: (context) => CustomDatePicker(
         datePreset: datePreset,
+        dateTime: datePreset == DatePreset.none
+            ? withoutPresetDateTime
+            : datePreset == DatePreset.four
+                ? fourPresetDateTime
+                : datePreset == DatePreset.six
+                    ? sixPresetDateTime
+                    : null,
         save: (dateTime) {
           switch (datePreset) {
             case DatePreset.none:

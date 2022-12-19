@@ -6,11 +6,13 @@ import 'package:realtime_test/presentation/widgets/primary_button.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CustomDatePicker extends StatefulWidget {
+  final DateTime? dateTime;
   final DatePreset datePreset;
   final Function(DateTime) save;
 
   const CustomDatePicker({
     super.key,
+    this.dateTime,
     this.datePreset = DatePreset.none,
     required this.save,
   });
@@ -21,6 +23,12 @@ class CustomDatePicker extends StatefulWidget {
 
 class _CustomDatePickerState extends State<CustomDatePicker> {
   var dateToday = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    dateToday = widget.dateTime ?? DateTime.now();
+  }
 
   int get daysInMonth {
     final year = dateToday.year;
